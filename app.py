@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from file_processor import FileProcessor
 from rag_chain import RAGSystem
+
 from utils import clear_directory, format_docs
 import time
 from dotenv import load_dotenv
