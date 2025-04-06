@@ -73,11 +73,21 @@ class RAGSystem:
         
         Explanation:"""
         
+        answer_template = """You are a helpful study assistant. Answer the following question based on the context provided.
+        Be thorough and detailed in your response.
+        
+        Context: {context}
+        
+        Question: {question}
+        
+        Answer:"""
+        
         self.prompt_templates = {
             "summary": PromptTemplate.from_template(summary_template),
             "quiz": PromptTemplate.from_template(quiz_template),
             "exam": PromptTemplate.from_template(exam_template),
             "explain": PromptTemplate.from_template(explain_template),
+            "answer": PromptTemplate.from_template(answer_template),
         }
     
     def query(self, question: str, task_type: str = "summary") -> str:
@@ -104,3 +114,11 @@ class RAGSystem:
         response = chain.invoke({"context": context, "question": question})
         
         return response.content
+    
+    def update_model_settings(self, model_name: str, temperature: float):
+        """Update the LLM model settings."""
+        self.llm = ChatGroq(
+            temperature=temperature,
+            model_name=model_name,
+            groq_api_key=groq_api
+        )

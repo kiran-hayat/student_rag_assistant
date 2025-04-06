@@ -99,11 +99,13 @@ with st.sidebar:
 st.title("Study Assistant RAG")
 st.markdown("Get help with your study materials using AI-powered retrieval and generation.")
 
-# Task selection
+# Task selection - make it optional
+st.markdown("**Select Task Type (optional)**")
 task_type = st.radio(
     "Select Task Type",
-    ["summary", "quiz", "exam", "explain"],
+    ["none", "summary", "quiz", "exam", "explain"],
     format_func=lambda x: {
+        "none": "❓ Just Answer My Question",
         "summary": "📝 Summary",
         "quiz": "❓ Generate Quiz",
         "exam": "📝 Create Exam",
@@ -115,7 +117,7 @@ task_type = st.radio(
 # Query input
 query = st.text_area(
     "Enter your question or topic",
-    placeholder="E.g., 'Summarize the key concepts in chapter 3' or 'Create a quiz about cellular biology'",
+    placeholder="E.g., 'Summarize the key concepts in chapter 3' or 'Explain cellular biology'",
     height=100
 )
 
@@ -123,12 +125,23 @@ query = st.text_area(
 if st.button("Get Assistance"):
     if not st.session_state.processed:
         st.warning("Please upload and process documents first.")
-    elif not query.strip():
-        st.warning("Please enter a question or topic.")
+    elif not query.strip() and task_type == "none":
+        st.warning("Please enter a question or select a task type.")
     else:
         with st.spinner("Generating response..."):
             start_time = time.time()
-            response = st.session_state.rag_system.query(query, task_type)
+            
+            # Determine how to handle the query based on selections
+            if task_type == "none":
+                # Direct answer to the question
+                response = st.session_state.rag_system.query(query, "answer")
+            elif not query.strip():
+                # Use the task type as the question
+                response = st.session_state.rag_system.query(task_type, task_type)
+            else:
+                # Both task type and question provided
+                response = st.session_state.rag_system.query(query, task_type)
+            
             elapsed_time = time.time() - start_time
             
             st.subheader("Response")
@@ -136,10 +149,3 @@ if st.button("Get Assistance"):
             
             # Display performance metrics
             st.caption(f"Generated in {elapsed_time:.2f} seconds")
-
-# Display document chunks if processed
-if st.session_state.processed and st.checkbox("Show document chunks"):
-    st.subheader("Document Chunks")
-    st.markdown(format_docs(st.session_state.docs[:5]))  # Show first 5 chunks
-    if len(st.session_state.docs) > 5:
-        st.info(f"Showing 5 of {len(st.session_state.docs)} chunks. Upload more specific questions to see relevant chunks.")
