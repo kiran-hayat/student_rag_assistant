@@ -1,9 +1,7 @@
-import streamlit as st
-st.cache_resource.clear() 
+import streamlit as st 
 import os
 from file_processor import FileProcessor
 from rag_chain import RAGSystem
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from utils import clear_directory, format_docs
 import time
 from dotenv import load_dotenv

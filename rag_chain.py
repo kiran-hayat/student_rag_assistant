@@ -12,9 +12,7 @@ groq_api = os.getenv('GROQ_API_KEY')
 os.environ['GROQ_API_KEY'] = groq_api 
 class RAGSystem:
     def __init__(self, model_name="llama3-70b-8192", temperature=0.7):
-        self.embedding_model = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-mpnet-base-v2"
-        )
+        self.embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
         self.llm = ChatGroq(
             temperature=temperature,
             model_name=model_name,
